@@ -1,0 +1,489 @@
+
+Learning: 1
+//Creating a simple compose function and preview function
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {//used for creating the layout design
+            MessageCard(message = "Good Morning")//composable function
+        }
+    }
+
+    //normal function having composable annotation, makes its composable function.
+    //Composable function is always be called from another composable function or setContent method.
+    //Composable function that returns unit should always start with capital letter.
+    @Composable
+    fun MessageCard(message: String){
+        Text(text = message) // Text is used for printing the text -> its like textView of xml.
+    }
+
+    //Preview annotation is used to preview the layout design.
+    //preview function doesnt have any parameter, so always wrap parameter function inside a new function having no paramter
+    @Preview
+    @Composable
+    fun PreviewMessageCard(){
+        MessageCard(message = "Good Morning Sunshine")
+    }
+}
+
+-----------------
+Learning 2
+//Compose function having multiple text to print.
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            MessageCard(Message("Amit Sen", "Its a good book to study"))
+        }
+    }
+
+    data class Message(val author: String, val body: String) //data class
+
+    //here both the text will overlap to each other, reason is we have not set the position of text
+    @Composable
+    fun MessageCard(message: Message){
+        Text(text = message.author)
+        Text(text = message.body)
+    }
+
+    @Preview
+    @Composable
+    fun PreviewMessageCard(){
+        MessageCard(Message("Amit Sen", "Good book"))
+    }
+}
+
+--------------
+Learning 3
+//Alignment to text vertically using Column function of compose.
+
+    //use Column for vertical alignment.
+    //import androidx.compose.foundation.layout.Column
+    //ColumnScope
+    @Composable
+    fun MessageCard(message: Message){
+        Column {
+            Text(text = message.author)
+            Text(text = message.body)
+        }
+    }
+
+----------------
+Learning 4
+//Alignment of image and Column horizontally and then text inside column is aligned to each other vertically
+
+
+    //Use row for horizontal alignment
+    //Use column for vertical alignment
+    @Composable
+    fun MessageCard(message: Message){
+        Row {
+            Image(painter = painterResource(id = R.drawable.profile_pic_one), contentDescription = "content profile picture")
+            Column {
+                Text(text = message.author)
+                Text(text = message.body)
+            }
+        }
+
+    }
+
+---------
+
+learning 5
+//Uses of modifiers
+
+    //modifier is used to  change the composable's size, layout, appearance or add high-level interactions, such as making an element clickable.
+    //chain modifiers to create richer composables
+    @Composable
+    fun MessageCard(message: Message){
+        Row(modifier = Modifier.padding(all = 8.dp)){
+            Image(painter = painterResource(id = R.drawable.profile_pic_one),
+                contentDescription = "content profile picture",
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape))
+            Spacer(modifier = Modifier.width(8.dp)) //used for margin, if used with Row -> horizontal spacing
+            Column {
+                Text(text = message.author)
+                Spacer(modifier = Modifier.height(4.dp))//if used with Column -> Vertical spacing
+                Text(text = message.body)
+            }
+        }
+
+    }
+
+-------------
+learning 6
+//Material design
+//Material Design is built around three pillars: Color, Typography, and Shape
+
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            ComposeBasicOneTheme {//for setting theme of the layout, this theme is auto genertated inside the Theme.kt file
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    MessageCard(Message("Amit Sen", "Its a good book to study"))
+                }
+            }
+        }
+    }
+
+    data class Message(val author: String, val body: String) //data class
+
+    @Composable
+    fun MessageCard(message: Message) {
+        Row(modifier = Modifier.padding(all = 8.dp)) {
+            Image(
+                painter = painterResource(id = R.drawable.profile_pic_one),
+                contentDescription = "content profile picture",
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .border(1.5.dp, MaterialTheme.colorScheme.secondary, CircleShape) //materialtheme color
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Column {
+                Text(text = message.author,
+                color = Color.Black, //android standard color
+                style = MaterialTheme.typography.titleSmall)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = message.body,
+                style = MaterialTheme.typography.bodyMedium) //MaterialTheme typography
+            }
+        }
+    }
+
+    @Preview
+    @Composable
+    fun PreviewMessageCard() {
+        ComposeBasicOneTheme {
+            Surface(modifier = Modifier.fillMaxSize()) {
+                MessageCard(Message("Amit Sen", "Good book"))
+            }
+        }
+    }
+}
+------------
+Learning 7
+//LazyColumn, LazyRow for long list
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            ComposeBasicOneTheme {//for setting theme of the layout, this theme is auto genertated inside the Theme.kt file
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    Conversation(messages = SampleData.conversationSample)
+                }
+            }
+        }
+    }
+
+    //LazyColumn and LazyRow -> These composables render only the elements that are visible on screen, so they are designed to be very efficient for long lists.
+    @Composable
+    fun Conversation(messages: List<Message>){
+        LazyColumn{
+            items(messages){ message -> //lambda expression
+                MessageCard(message = message)
+            }
+        }
+    }
+
+----------
+Learning 8
+
+overall project after completing step 1
+
+Color.kt
+
+import androidx.compose.ui.graphics.Color
+
+val Purple200 = Color(0xFFBB86FC)
+val Purple500 = Color(0xFF6200EE)
+val Purple700 = Color(0xFF3700B3)
+val Teal200 = Color(0xFF03DAC5)
+
+
+Shape.kt
+
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Shapes
+import androidx.compose.ui.unit.dp
+
+val Shapes = Shapes(
+    small = RoundedCornerShape(4.dp),
+    medium = RoundedCornerShape(4.dp),
+    large = RoundedCornerShape(0.dp)
+)
+
+Type.kt
+
+import androidx.compose.material3.Typography
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+
+// Set of Material typography styles to start with
+val Typography = Typography(
+    TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp
+    )
+    /* Other default text styles to override
+    button = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.W500,
+        fontSize = 14.sp
+    ),
+    caption = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp
+    )
+    */
+)
+
+Theme.kt
+
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.Composable
+
+private val DarkColorPalette = darkColorScheme(
+    primary = Purple200,
+    secondary = Teal200
+)
+
+private val LightColorPalette = lightColorScheme(
+    primary = Purple500,
+    secondary = Teal200
+
+    /* Other default colors to override
+    background = Color.White,
+    surface = Color.White,
+    onPrimary = Color.White,
+    onSecondary = Color.Black,
+    onBackground = Color.Black,
+    onSurface = Color.Black,
+    */
+)
+
+@Composable
+fun ComposeBasicThreeTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit
+) {
+    val colors = if (darkTheme) {
+        DarkColorPalette
+    } else {
+        LightColorPalette
+    }
+
+    MaterialTheme(
+        colorScheme = colors,
+        typography = Typography,
+        shapes = Shapes,
+        content = content
+    )
+}
+
+MainActivity
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import ecaps.dna.composebasicthree.ui.theme.ComposeBasicThreeTheme
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            ComposeBasicThreeTheme {
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    Conversation(messages = SampleData.conversationSample)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MessageCard(message: Message) {
+    Row(modifier = Modifier.padding(all = 8.dp)) {
+        Image(
+            painter = painterResource(id = R.drawable.profile_pic_one),
+            contentDescription = "content profile picture",
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .border(1.5.dp, MaterialTheme.colorScheme.primary, CircleShape)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+
+        var isExpanded by remember { mutableStateOf(false) }
+
+        Column(modifier = Modifier.clickable { isExpanded = !isExpanded }) {
+            Text(text = message.author,
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(4.dp))
+            Surface {
+                Text(text = message.body,
+                    modifier = Modifier.padding(all = 4.dp),
+                    softWrap = true,
+                    style = MaterialTheme.typography.titleSmall)
+            }
+        }
+    }
+}
+
+@Composable
+fun Conversation(messages: List<Message>){
+    LazyColumn{
+        items(messages){ message ->
+            MessageCard(message = message)
+        }
+    }
+}
+
+@Preview
+@Composable
+fun PreviewMessageCard() {
+    ComposeBasicThreeTheme() {
+        Surface(modifier = Modifier.fillMaxSize()) {
+            Conversation(messages = SampleData.conversationSample)
+        }
+    }
+}
+
+
+--------
+Learning 9:
+build.gradle(project)
+build.gradle(module)
+https://developer.android.com/jetpack/compose/setup#groovy_1
+
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'ecaps.dna.composebasicthree'
+    compileSdk 33
+
+    defaultConfig {
+        applicationId "ecaps.dna.composebasicthree"
+        minSdk 26
+        targetSdk 32
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary true
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    buildFeatures {
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion '1.3.2'
+    }
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
+    }
+}
+
+dependencies {
+
+    def composeBom = platform("androidx.compose:compose-bom:2022.12.00")
+    implementation composeBom
+    androidTestImplementation composeBom
+
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation 'androidx.compose.ui:ui'
+    // Android Studio Preview support
+    implementation 'androidx.compose.ui:ui-tooling-preview'
+    // Integration with activities
+    implementation("androidx.activity:activity-compose:1.6.1")
+    // Integration with ViewModels
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1")
+    //  Integration with LiveData
+    implementation("androidx.compose.runtime:runtime-livedata")
+    // Integration with RxJava
+    implementation("androidx.compose.runtime:runtime-rxjava2")
+
+    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
+
+    //debugging
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+
+    testImplementation 'junit:junit:4.13.2'
+
+}
+----
+
+buildscript {
+    ext {
+        compose_ui_version = '1.1.1'
+    }
+}// Top-level build file where you can add configuration options common to all sub-projects/modules.
+plugins {
+    id 'com.android.application' version '7.3.1' apply false
+    id 'com.android.library' version '7.3.1' apply false
+    id 'org.jetbrains.kotlin.android' version '1.7.20' apply false
+}
+
+-----------
+learning 10:
+
+
+
+
+
