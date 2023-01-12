@@ -3,6 +3,9 @@ package ecaps.dna.composebasicthree
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -10,10 +13,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
@@ -26,16 +29,36 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ComposeBasicThreeTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    Conversation(messages = SampleData.conversationSample)
-                }
+                MyApp(Modifier.fillMaxSize())
             }
         }
     }
 }
 
 @Composable
+fun MyApp(modifier: Modifier = Modifier) {
+    var shouldShowOnBoarding by rememberSaveable { mutableStateOf(true) }
+    Surface(modifier) {
+        if (shouldShowOnBoarding) {
+            OnBoardingScreen(onContinueClicked = { shouldShowOnBoarding = false })
+        } else {
+            Conversation(messages = SampleData.conversationSample)
+        }
+    }
+}
+
+@Composable
 fun MessageCard(message: Message) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
+
+    val extraPadding by animateDpAsState(
+        if (expanded) 48.dp else 0.dp,
+/*        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        )*/
+    )
+
     Row(modifier = Modifier.padding(all = 8.dp)) {
         Image(
             painter = painterResource(id = R.drawable.profile_pic_one),
@@ -47,19 +70,30 @@ fun MessageCard(message: Message) {
         )
         Spacer(modifier = Modifier.width(8.dp))
 
-        var isExpanded by remember { mutableStateOf(false) }
-
-        Column(modifier = Modifier.clickable { isExpanded = !isExpanded }) {
-            Text(text = message.author,
+        Column(modifier = Modifier
+            .clickable { }
+            .weight(1f)
+            .padding(bottom = extraPadding)) {
+            Text(
+                text = message.author,
                 color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.titleMedium)
+                style = MaterialTheme.typography.titleMedium
+            )
             Spacer(modifier = Modifier.height(4.dp))
             Surface {
-                Text(text = message.body,
+                Text(
+                    text = message.body,
                     modifier = Modifier.padding(all = 4.dp),
                     softWrap = true,
-                    style = MaterialTheme.typography.titleSmall)
+                    style = MaterialTheme.typography.titleSmall
+                )
             }
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        ElevatedButton(
+            onClick = { expanded = !expanded }
+        ) {
+            Text(if (expanded) "show less" else "show more")
         }
     }
 }
@@ -80,6 +114,34 @@ fun PreviewMessageCard() {
         Surface(modifier = Modifier.fillMaxSize()) {
             Conversation(messages = SampleData.conversationSample)
         }
+    }
+}
+
+@Composable
+fun OnBoardingScreen(
+    onContinueClicked: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "Welcome to basic codelab")
+        ElevatedButton(
+            modifier = Modifier.padding(vertical = 24.dp),
+            onClick = onContinueClicked
+        ) {
+            Text("Continue")
+        }
+    }
+}
+
+@Preview(showBackground = true, widthDp = 320, heightDp = 320)
+@Composable
+fun OnBoardingPreview() {
+    ComposeBasicThreeTheme {
+        OnBoardingScreen(onContinueClicked = {})
     }
 }
 
